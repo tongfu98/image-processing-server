@@ -1,0 +1,10 @@
+numpy
+matplotlib
+Pillow
+scikit-image
+dnspython
+pymodm
+pytest
+pytest-pep8
+requests
+flask
