@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+import numpy as np
 import base64
 import io
 import matplotlib.image as mpimg
@@ -55,6 +56,12 @@ def get_new_upload_image(b64_str):
         return tk_image
 
 
+# def get_new_invert_image(b64_str):
+#     img_ndarray = b64_string_to_ndarray(b64_str)
+#     tk_image = ndarray_to_tkinter_image(img_ndarray)
+#     return tk_image
+
+
 def main_window():
 
     def open_button_cmd():
@@ -63,15 +70,22 @@ def main_window():
         original_new_upload['name'] = root.newFilename
         b64str = image_file_to_b64_string(root.newFilename)
         original_new_upload['b64_string'] = b64str
-        print("The selected image is {}".format(root.newFilename))
+        # print("The selected image is {}".format(root.newFilename))
         new_tk_image = get_new_upload_image(b64str)
         bg_label_1.image = new_tk_image
         bg_label_1.configure(image=new_tk_image)
         return
 
-    def invert_button_cmd():
 
-        return
+    def invert_button_cmd():
+        if len(original_new_upload) != 0:
+            b64str = original_new_upload['b64_string']
+            ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
+            original_new_upload['b64_string_inv'] = ndarray_inv
+            new_tk_image_inv = ndarray_to_tkinter_image(ndarray_inv)
+            bg_label_2.image = new_tk_image_inv
+            bg_label_2.configure(image=new_tk_image_inv)
+            return
 
 
     root = Tk()
@@ -126,7 +140,7 @@ def main_window():
     invert_label = ttk.Label(root, text="Invert the image you upload")
     invert_label.grid(column=3, row=1)
 
-    # start invertion button
+    # start inverting button
     invert_button = ttk.Button(root, text="Invert", command=invert_button_cmd)
     invert_button.grid(column=3, row=2)
 
