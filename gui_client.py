@@ -14,6 +14,7 @@ original_new_upload = {}
 processed_new_upload = {}
 
 
+
 def image_file_to_b64_string(filename):
     with open(filename, "rb") as image_file:
         b64_bytes = base64.b64encode(image_file.read())
@@ -21,9 +22,9 @@ def image_file_to_b64_string(filename):
     return b64_string
 
 
-def b64_string_to_image_file(b64_string):
+def b64_string_to_image_file(b64_string, newfilename):
     image_bytes = base64.b64decode(b64_string)
-    with open(new_filename, "wb") as out_file:
+    with open(newfilename, "wb") as out_file:
         out_file.write(image_bytes)
 
 
@@ -56,11 +57,6 @@ def get_new_upload_image(b64_str):
         return tk_image
 
 
-# def get_new_invert_image(b64_str):
-#     img_ndarray = b64_string_to_ndarray(b64_str)
-#     tk_image = ndarray_to_tkinter_image(img_ndarray)
-#     return tk_image
-
 
 def main_window():
 
@@ -76,7 +72,6 @@ def main_window():
         bg_label_1.configure(image=new_tk_image)
         return
 
-
     def invert_button_cmd():
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
@@ -86,6 +81,15 @@ def main_window():
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
             return
+
+    def download_ori_cmd():
+        if len(original_new_upload) != 0:
+            b64str = original_new_upload['b64_string']
+            root.downloadname = filedialog.asksaveasfilename(initialdir="/", title="Select file",
+                                                    filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+            b64_string_to_image_file(b64str, root.downloadname)
+            return
+
 
 
     root = Tk()
@@ -129,7 +133,7 @@ def main_window():
     ori_size_data.grid(column=0, row=5, columnspan=2)
 
     # download original button
-    ori_download_button = ttk.Button(root, text="Download")
+    ori_download_button = ttk.Button(root, text="Download", command=download_ori_cmd)
     ori_download_button.grid(column=0, row=6, columnspan=2)
 
     # image process label
