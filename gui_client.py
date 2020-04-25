@@ -50,6 +50,13 @@ def ndarray_to_tkinter_image(img_ndarray):
     tk_image = ImageTk.PhotoImage(img_obj)
     return tk_image
 
+def ndarray_to_b64_string(img_ndarray):
+    f = io.BytesIO()
+    imsave(f, img_ndarray, plugin='pil')
+    y = base64.b64encode(f.getvalue())
+    b64_string = str(y, encoding='utf-8')
+    return b64_string
+
 
 def get_new_upload_image(b64_str):
         img_ndarray = b64_string_to_ndarray(b64_str)
@@ -76,7 +83,7 @@ def main_window():
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
-            original_new_upload['b64_string_inv'] = ndarray_inv
+            original_new_upload['b64_string_inv'] = ndarray_to_b64_string(ndarray_inv)
             new_tk_image_inv = ndarray_to_tkinter_image(ndarray_inv)
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
@@ -85,9 +92,17 @@ def main_window():
     def download_ori_cmd():
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
-            root.downloadname = filedialog.asksaveasfilename(initialdir="/", title="Select file",
+            root.downloadname_ori = filedialog.asksaveasfilename(initialdir="/", title="Select file",
                                                     filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
-            b64_string_to_image_file(b64str, root.downloadname)
+            b64_string_to_image_file(b64str, root.downloadname_ori)
+            return
+
+    def download_processed_cmd():
+        if len(original_new_upload) != 0:
+            b64str_inv = original_new_upload['b64_string_inv']
+            root.downloadname_inv = filedialog.asksaveasfilename(initialdir="/", title="Select file",
+                                                    filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+            b64_string_to_image_file(b64str_inv, root.downloadname_inv)
             return
 
 
@@ -171,9 +186,9 @@ def main_window():
     processed_size_data = ttk.Label(root, text="image size: {}".format(processed_size_data))
     processed_size_data.grid(column=3, row=5, columnspan=2)
 
-    # download original button
-    ori_download_button = ttk.Button(root, text="Download")
-    ori_download_button.grid(column=3, row=6, columnspan=2)
+    # download processed button
+    processed_download_button = ttk.Button(root, text="Download", command=download_processed_cmd)
+    processed_download_button.grid(column=3, row=6, columnspan=2)
 
 
     root.mainloop()
