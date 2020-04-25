@@ -5,11 +5,13 @@ from PIL import Image, ImageTk
 import base64
 import io
 import matplotlib.image as mpimg
+from matplotlib import pyplot as plt
 from skimage.io import imsave
 
 
 original_new_upload = {}
 processed_new_upload = {}
+
 
 def image_file_to_b64_string(filename):
     with open(filename, "rb") as image_file:
@@ -18,11 +20,22 @@ def image_file_to_b64_string(filename):
     return b64_string
 
 
+def b64_string_to_image_file(b64_string):
+    image_bytes = base64.b64decode(b64_string)
+    with open(new_filename, "wb") as out_file:
+        out_file.write(image_bytes)
+
+
 def b64_string_to_ndarray(b64_string):
     image_bytes = base64.b64decode(b64_string)
     image_buf = io.BytesIO(image_bytes)
     img_ndarray = mpimg.imread(image_buf, format='JPG')
     return img_ndarray
+
+
+def display_image_in_ndarray(img_ndarray):
+    plt.imshow(img_ndarray, interpolation='nearest')
+    plt.show()
 
 
 def ndarray_to_tkinter_image(img_ndarray):
@@ -50,13 +63,16 @@ def main_window():
         original_new_upload['name'] = root.newFilename
         b64str = image_file_to_b64_string(root.newFilename)
         original_new_upload['b64_string'] = b64str
-
         print("The selected image is {}".format(root.newFilename))
-
         new_tk_image = get_new_upload_image(b64str)
         bg_label_1.image = new_tk_image
         bg_label_1.configure(image=new_tk_image)
         return
+
+    def invert_button_cmd():
+
+        return
+
 
     root = Tk()
     root.title("Image Database")
@@ -111,7 +127,7 @@ def main_window():
     invert_label.grid(column=3, row=1)
 
     # start invertion button
-    invert_button = ttk.Button(root, text="Invert")
+    invert_button = ttk.Button(root, text="Invert", command=invert_button_cmd)
     invert_button.grid(column=3, row=2)
 
     # choose database dropdown
