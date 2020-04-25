@@ -14,14 +14,6 @@ processed_new = []
 
 def main_window():
 
-    # def open_button_cmd():
-    #     image_name = organ_choice.get()
-    #     print("The selected image is {}".format(image_name))
-    #     new_tk_image = get_new_image(image_name)
-    #     image_label.image = new_tk_image
-    #     image_label.configure(image=new_tk_image)
-    #     return
-
 
     root = Tk()
 
@@ -104,37 +96,9 @@ def main_window():
     ori_download_button.grid(column=3, row=6, columnspan=2)
 
 
-
-
-    # root.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
-    #                                            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
-
-    # path = tkFileDialog.askopenfilename(filetypes=[("Image File", '.jpg')])
-    # im = Image.open(path)
-    # tkimage = ImageTk.PhotoImage(im)
-    # myvar = Label(root, image=tkimage)
-    # myvar.image = tkimage
-    # myvar.pack()
-
-
-    #
-    # organ_choice = StringVar()
-    # organ_choice_box = ttk.Combobox(root, textvariable=organ_choice)
-    # organ_choice_box.grid(column=1, row=0)
-    # organ_choice_box['value'] = ('brain.png', 'heart.png', 'kidney.png')
-    #
-    #
-
-    #
-    #
-    # open_button = ttk.Button(root, text="Open", command=open_button_cmd)
-    # open_button.grid(column=0, row=2, columnspan=2)
-
-
     root.mainloop()
     return
 
 
 if __name__ == '__main__':
-    # init_db()
     main_window()
