@@ -8,14 +8,60 @@ import matplotlib.image as mpimg
 from skimage.io import imsave
 
 
-original_new = []
-processed_new = []
+original_new_upload = {}
+processed_new_upload = {}
+
+def image_file_to_b64_string(filename):
+    with open(filename, "rb") as image_file:
+        b64_bytes = base64.b64encode(image_file.read())
+    b64_string = str(b64_bytes, encoding='utf-8')
+    return b64_string
+
+
+def b64_string_to_ndarray(b64_string):
+    image_bytes = base64.b64decode(b64_string)
+    image_buf = io.BytesIO(image_bytes)
+    img_ndarray = mpimg.imread(image_buf, format='JPG')
+    return img_ndarray
+
+
+def ndarray_to_tkinter_image(img_ndarray):
+    f = io.BytesIO()
+    imsave(f, img_ndarray, plugin='pil')
+    out_img = io.BytesIO()
+    out_img.write(f.getvalue())
+    img_obj = Image.open(out_img)
+    img_obj.thumbnail((500,500), Image.ANTIALIAS)
+    tk_image = ImageTk.PhotoImage(img_obj)
+    return tk_image
+
+
+def get_new_upload_image(b64_str):
+        img_ndarray = b64_string_to_ndarray(b64_str)
+        tk_image = ndarray_to_tkinter_image(img_ndarray)
+        return tk_image
 
 
 def main_window():
 
+    def open_button_cmd():
+        root.newFilename = filedialog.askopenfilename(initialdir="/", title="Select file",
+                                                   filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+        original_new_upload['name'] = root.newFilename
+        b64str = image_file_to_b64_string(root.newFilename)
+        original_new_upload['b64_string'] = b64str
+
+        print("The selected image is {}".format(root.newFilename))
+
+        new_tk_image = get_new_upload_image(b64str)
+        bg_label_1.image = new_tk_image
+        bg_label_1.configure(image=new_tk_image)
+        return
 
     root = Tk()
+    root.title("Image Database")
+    root.geometry("1050x800")
+
 
     # original image label
     select_label = ttk.Label(root, text="Original Image")
@@ -25,9 +71,9 @@ def main_window():
     select_label = ttk.Label(root, text="Upload a new image")
     select_label.grid(column=0, row=1)
 
-    # Select original button
-    select_button = ttk.Button(root, text="Open")
-    select_button.grid(column=0, row=2)
+    # open original button
+    open_button = ttk.Button(root, text="Open", command=open_button_cmd)
+    open_button.grid(column=0, row=2)
 
     # choose database dropdown
     ttk.Label(root, text="Select from database").grid(column=1, row=1)
@@ -42,7 +88,7 @@ def main_window():
     bg_image_1 = ImageTk.PhotoImage(background)
     bg_label_1 = ttk.Label(root, image=bg_image_1)
     bg_label_1.image = bg_image_1
-    bg_label_1.grid(column=0, row=3, columnspan=2)
+    bg_label_1.grid(column=0, row=3, columnspan=2, padx=5)
 
     # show original metadata
     ori_timestamp_data = "Default"
