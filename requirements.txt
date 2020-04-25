@@ -8,5 +8,4 @@ pytest
 pytest-pep8
 requests
 flask
-pymodm
-dnspython
+
