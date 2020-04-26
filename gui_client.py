@@ -35,11 +35,6 @@ def b64_string_to_ndarray(b64_string):
     return img_ndarray
 
 
-def display_image_in_ndarray(img_ndarray):
-    plt.imshow(img_ndarray, interpolation='nearest')
-    plt.show()
-
-
 def ndarray_to_tkinter_image(img_ndarray):
     f = io.BytesIO()
     imsave(f, img_ndarray, plugin='pil')
@@ -60,9 +55,9 @@ def ndarray_to_b64_string(img_ndarray):
 
 
 def get_new_upload_image(b64_str):
-        img_ndarray = b64_string_to_ndarray(b64_str)
-        tk_image = ndarray_to_tkinter_image(img_ndarray)
-        return tk_image
+    img_ndarray = b64_string_to_ndarray(b64_str)
+    tk_image = ndarray_to_tkinter_image(img_ndarray)
+    return tk_image
 
 
 def get_image_size(b64_str):
