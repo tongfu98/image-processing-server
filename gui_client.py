@@ -50,6 +50,7 @@ def ndarray_to_tkinter_image(img_ndarray):
     tk_image = ImageTk.PhotoImage(img_obj)
     return tk_image
 
+
 def ndarray_to_b64_string(img_ndarray):
     f = io.BytesIO()
     imsave(f, img_ndarray, plugin='pil')
@@ -74,8 +75,9 @@ def get_image_size(b64_str):
 def main_window():
 
     def open_button_cmd():
-        root.newFilename = filedialog.askopenfilename(initialdir="/", title="Select file",
-                                                   filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+        root.newFilename = filedialog.askopenfilename(
+            initialdir="/", title="Select file",
+            filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
         original_new_upload['name'] = root.newFilename
         b64str = image_file_to_b64_string(root.newFilename)
         original_new_upload['b64_string'] = b64str
@@ -84,65 +86,67 @@ def main_window():
         original_new_upload['upload_timestamp'] = str(datetime.now())
         # print("The selected image is {}".format(root.newFilename))
         new_tk_image = get_new_upload_image(b64str)
-        ori_metadata_change(original_new_upload['upload_timestamp'], width, height)
+        ori_metadata_change(original_new_upload['upload_timestamp'],
+                            width, height)
         original_new_upload['upload_size'] = [width, height]
         bg_label_1.image = new_tk_image
         bg_label_1.configure(image=new_tk_image)
         return
-
 
     def ori_metadata_change(timestamp, width, height):
         ori_timestamp_label["text"] = "timestamp: {}".format(timestamp)
         ori_size_label["text"] = "image size: {} * {}".format(width, height)
         return
 
-
     def invert_button_cmd():
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
-            original_new_upload['b64_string_inv'] = ndarray_to_b64_string(ndarray_inv)
+            original_new_upload['b64_string_inv'] = \
+                ndarray_to_b64_string(ndarray_inv)
             b64str_inv = original_new_upload['b64_string_inv']
             width = get_image_size(b64str_inv)[0]
             height = get_image_size(b64str_inv)[1]
-            original_new_upload['processed_timestamp'] = str(datetime.now())
+            original_new_upload['processed_timestamp'] = \
+                str(datetime.now())
             new_tk_image_inv = ndarray_to_tkinter_image(ndarray_inv)
-            pro_metadata_change(original_new_upload['processed_timestamp'], width, height)
+            pro_metadata_change(original_new_upload['processed_timestamp'],
+                                width, height)
             original_new_upload['processed_size'] = [width, height]
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
             return
 
     def pro_metadata_change(timestamp, width, height):
-        processed_timestamp_label["text"] = "timestamp: {}".format(timestamp)
-        processed_size_label["text"] = "image size: {} * {}".format(width, height)
+        processed_timestamp_label["text"] = "timestamp: {}"\
+            .format(timestamp)
+        processed_size_label["text"] = "image size: {} * {}"\
+            .format(width, height)
         return
-
 
     def download_ori_cmd():
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
-            root.downloadname_ori = filedialog.asksaveasfilename(initialdir="/", title="Select file",
-                                                    filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+            root.downloadname_ori = filedialog.asksaveasfilename(
+                initialdir="/", title="Select file",
+                filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
             b64_string_to_image_file(b64str, root.downloadname_ori)
             return
 
     def download_processed_cmd():
         if len(original_new_upload) != 0:
             b64str_inv = original_new_upload['b64_string_inv']
-            root.downloadname_inv = filedialog.asksaveasfilename(initialdir="/", title="Select file",
-                                                    filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
+            root.downloadname_inv = filedialog.asksaveasfilename(
+                initialdir="/", title="Select file",
+                filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
             b64_string_to_image_file(b64str_inv, root.downloadname_inv)
             return
-
-
 
     root = Tk()
     root.title("Image Database")
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     root.geometry("{}x{}".format(int(screen_width*9/10), screen_height))
-
 
     # original image label
     select_label = ttk.Label(root, text="Original Image")
@@ -178,7 +182,8 @@ def main_window():
     ori_size_label.grid(column=0, row=5, columnspan=2)
 
     # download original button
-    ori_download_button = ttk.Button(root, text="Download", command=download_ori_cmd)
+    ori_download_button = ttk.Button(root, text="Download",
+                                     command=download_ori_cmd)
     ori_download_button.grid(column=0, row=6, columnspan=2)
 
     # image process label
@@ -190,7 +195,8 @@ def main_window():
     invert_label.grid(column=3, row=1)
 
     # start inverting button
-    invert_button = ttk.Button(root, text="Invert", command=invert_button_cmd)
+    invert_button = ttk.Button(root, text="Invert",
+                               command=invert_button_cmd)
     invert_button.grid(column=3, row=2)
 
     # choose database dropdown
@@ -215,9 +221,9 @@ def main_window():
     processed_size_label.grid(column=3, row=5, columnspan=2)
 
     # download processed button
-    processed_download_button = ttk.Button(root, text="Download", command=download_processed_cmd)
+    processed_download_button = ttk.Button(root, text="Download",
+                                           command=download_processed_cmd)
     processed_download_button.grid(column=3, row=6, columnspan=2)
-
 
     root.mainloop()
     return
