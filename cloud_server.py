@@ -6,21 +6,21 @@ from flask_pymongo import PyMongo
 
 
 app = Flask(__name__)
-# app.config['MONGO_DBNAME'] = "images"
-# app.config['MONGO_URI'] = "mongodb://localhost:27017/images"
-# mongo = PyMongo(app)
+app.config['MONGO_DBNAME'] = "images"
+app.config['MONGO_URI'] = "mongodb://localhost:27017/images"
+mongo = PyMongo(app)
 
 
 
-class UploadedImages(MongoModel):
+class OriginalImages(MongoModel):
     name = fields.CharField()
-    b64_string = fields.CharField(primary_key=True)
+    b64_string = fields.CharField()
     upload_timestamp = fields.CharField()
     upload_size = fields.ListField()
 
 class InvertedImages(MongoModel):
-    inverted_name = fields.CharField()
-    b64_string_inv = fields.CharField(primary_key=True)
+    name_inv = fields.CharField()
+    b64_string_inv = fields.CharField()
     processed_timestamp = fields.CharField()
     processed_size = fields.ListField()
 
@@ -33,17 +33,17 @@ def init_db():
 
 
 
-def add_images_to_original():
-    new_original =UploadedImages(name = "test_image_1.jpg",
-                       b64_string = "iVBORw0KGgoAAAANSUhEUgAABD0AAALmCAYAAABB3e+uAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ",
-                       upload_timestamp = "20120303",
-                       upload_size = [30,30])
-    new_inverted =InvertedImages(inverted_name = "test_image_1.jpg",
-                                 b64_string_inv = "iVBORw0KGgoAAAANSUhEUgAABD0AAALmCAYAAABB3e+uAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ",
-                                 processed_timestamp = "20120303",
-                                 processed_size = [30,30])
-    new_original.save()
-    new_inverted.save()
+# def add_images_to_original():
+#     new_original =OriginalImages(name = "test_image_1.jpg",
+#                        b64_string = "iVBORw0KGgoAAAANSUhEUgAABD0AAALmCAYAAABB3e+uAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ",
+#                        upload_timestamp = "20120303",
+#                        upload_size = [30,30])
+#     new_inverted =InvertedImages(inverted_name = "test_image_1.jpg",
+#                                  b64_string_inv = "iVBORw0KGgoAAAANSUhEUgAABD0AAALmCAYAAABB3e+uAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ",
+#                                  processed_timestamp = "20120303",
+#                                  processed_size = [30,30])
+#     new_original.save()
+#     new_inverted.save()
 
 
 
@@ -51,65 +51,103 @@ def is_upload_in_database(b64str):
 
     all_b64str = []
     all_original = OriginalImages.objects.raw({})
-    for images in all_original:
-        all_b64str.append(images.b64_string)
+    for im in all_original:
+        all_b64str.append(im.b64_string)
     if b64str in all_b64str:
         return True
 
 
+def is_inverted_in_database(b64str):
+
+    all_b64str_inv = []
+    all_inverted = InvertedImages.objects.raw({})
+    for im in all_inverted:
+        all_b64str_inv.append(im.b64_string_inv)
+    if b64str in all_b64str_inv:
+        return True
 
 
-@app.route('/addOriginal/<new_upload>', methods=['POST'])
-def post_uploaded_data():
-    original_images = mongo.db.OriginalImages
-    goal_new = {'name': new_goal}
-    if bucketList.find({'name': new_goal}).count() > 0:
-        return "Goal Already Exists!"
-    else:
-        bucketList.insert(goal_new)
-        return "Added Goal successfully"
+def add_original_to_database(name, b64str, time, size):
+    new_original = OriginalImages(name=name,
+                                  b64_string=b64str,
+                                  upload_timestamp=time,
+                                  upload_size=size)
+    new_original.save()
+
+def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
+    new_inverted = InvertedImages(name_inv=name_inv,
+                                  b64_string_inv=b64str_inv,
+                                  processed_timestamp=time_inv,
+                                  processed_size=size_inv)
+    new_inverted.save()
 
 
-
-def get_all_countries():
-    image_b64str = []
-    all_images = Images.objects.raw({})
-    for image in all_images:
-        if image.home_team not in teams:
-            teams.append(game.home_team)
-        if game.away_team not in teams:
-            teams.append(game.away_team)
-        teams.sort()
-        for team in teams:
-            print(team)
-
-
-def get_England_home_games():
-    england_home = WC_Game.objects.raw({"home_team":"England"})
-    print(england_home.count())
-    for game in england_home:
-        print("{}: {} {} - {} {}".format(game.year. game.home_team,
-                                         game.home_team_score, game.away_team,
-                                         game.away_team_score))
+@app.route('/addOriginal', methods=['POST'])
+def post_original_data():
+    in_dict = request.get_json()
+    check_result = is_upload_in_database(in_dict["b64_string"])
+    # if check_result is False:
+    name = in_dict["name"]
+    b64str = in_dict["b64_string"]
+    time = in_dict["upload_timestamp"]
+    size = in_dict["upload_size"]
+    add_original_to_database(name, b64str, time, size)
+    return "successfully add original", 200
 
 
-def get_England_away_games():
-    england_away = WC_Game.objects.raw({"away_team": "England"})
-    print(england_away.count())
-    for game in england_away:
-        print("{}: {} {} - {} {}".format(game.year.game.home_team,
-                                         game.home_team_score, game.away_team,
-                                         game.away_team_score))
+@app.route('/addInverted', methods=['POST'])
+def post_inverted_data():
+    in_dict = request.get_json()
+    check_result = is_inverted_in_database(in_dict["b64_string_inv"])
+    # if check_result is False:
+    name_inv = in_dict["inverted_name"]
+    b64str_inv = in_dict["b64_string_inv"]
+    time_inv = in_dict["processed_timestamp"]
+    size_inv = in_dict["processed_size"]
+    add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv)
+    return "successfully add processed", 200
 
-def get_England_all_games():
-    england_all = WC_Game.objects.raw({"$and": [
-        {"year":1958},
-        {"$or": [{"home_team": "England"}, {"away_team": "England"}]}
-    ]})
+# def get_all_countries():
+#     image_b64str = []
+#     all_images = Images.objects.raw({})
+#     for image in all_images:
+#         if image.home_team not in teams:
+#             teams.append(game.home_team)
+#         if game.away_team not in teams:
+#             teams.append(game.away_team)
+#         teams.sort()
+#         for team in teams:
+#             print(team)
+#
+#
+# def get_England_home_games():
+#     england_home = WC_Game.objects.raw({"home_team":"England"})
+#     print(england_home.count())
+#     for game in england_home:
+#         print("{}: {} {} - {} {}".format(game.year. game.home_team,
+#                                          game.home_team_score, game.away_team,
+#                                          game.away_team_score))
+#
+#
+# def get_England_away_games():
+#     england_away = WC_Game.objects.raw({"away_team": "England"})
+#     print(england_away.count())
+#     for game in england_away:
+#         print("{}: {} {} - {} {}".format(game.year.game.home_team,
+#                                          game.home_team_score, game.away_team,
+#                                          game.away_team_score))
+#
+# def get_England_all_games():
+#     england_all = WC_Game.objects.raw({"$and": [
+#         {"year":1958},
+#         {"$or": [{"home_team": "England"}, {"away_team": "England"}]}
+#     ]})
 
 
 
 if __name__ == "__main__":
     init_db()
-    add_images_to_original()
+    # add_images_to_original()
+    app.run()
+
 
