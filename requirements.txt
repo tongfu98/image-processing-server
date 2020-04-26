@@ -8,4 +8,4 @@ pytest
 pytest-pep8
 requests
 flask
-
+Flask-PyMongo
