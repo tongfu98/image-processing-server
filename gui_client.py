@@ -9,8 +9,10 @@ import matplotlib.image as mpimg
 from matplotlib import pyplot as plt
 from skimage.io import imsave
 from datetime import datetime
+import requests
 
 
+server_name = "http://127.0.0.1:5000/"
 original_new_upload = {}
 processed_new_upload = {}
 
@@ -66,6 +68,16 @@ def get_image_size(b64_str):
     width, height = im.size
     return width, height
 
+def add_new_upload_to_db():
+    new_upload = original_new_upload
+    r = requests.post(server_name + "/addOriginal", json=new_upload)
+    return r
+
+def add_new_processed_to_db():
+    new_upload = original_new_upload
+    r = requests.post(server_name + "/addInverted", json=new_upload)
+    return r
+
 
 def main_window():
 
@@ -73,7 +85,7 @@ def main_window():
         root.newFilename = filedialog.askopenfilename(
             initialdir="/", title="Select file",
             filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
-        original_new_upload['name'] = root.newFilename
+        original_new_upload['name'] = root.newFilename.split("/")[-1]
         b64str = image_file_to_b64_string(root.newFilename)
         original_new_upload['b64_string'] = b64str
         width = get_image_size(b64str)[0]
@@ -86,6 +98,7 @@ def main_window():
         original_new_upload['upload_size'] = [width, height]
         bg_label_1.image = new_tk_image
         bg_label_1.configure(image=new_tk_image)
+        add_new_upload_to_db()
         return
 
     def ori_metadata_change(timestamp, width, height):
@@ -95,6 +108,8 @@ def main_window():
 
     def invert_button_cmd():
         if len(original_new_upload) != 0:
+            original_new_upload['inverted_name'] = root.newFilename.split("/")[-1].split(".")[0] + "_inv." + \
+                                                   root.newFilename.split("/")[-1].split(".")[-1]
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
             original_new_upload['b64_string_inv'] = \
@@ -110,6 +125,7 @@ def main_window():
             original_new_upload['processed_size'] = [width, height]
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
+            add_new_processed_to_db()
             return
 
     def pro_metadata_change(timestamp, width, height):
