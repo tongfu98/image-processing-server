@@ -8,11 +8,11 @@ import io
 import matplotlib.image as mpimg
 from matplotlib import pyplot as plt
 from skimage.io import imsave
+from datetime import datetime
 
 
 original_new_upload = {}
 processed_new_upload = {}
-
 
 
 def image_file_to_b64_string(filename):
@@ -22,9 +22,9 @@ def image_file_to_b64_string(filename):
     return b64_string
 
 
-def b64_string_to_image_file(b64_string, newfilename):
+def b64_string_to_image_file(b64_string, new_file_name):
     image_bytes = base64.b64decode(b64_string)
-    with open(newfilename, "wb") as out_file:
+    with open(new_file_name, "wb") as out_file:
         out_file.write(image_bytes)
 
 
@@ -46,7 +46,7 @@ def ndarray_to_tkinter_image(img_ndarray):
     out_img = io.BytesIO()
     out_img.write(f.getvalue())
     img_obj = Image.open(out_img)
-    img_obj.thumbnail((500,500), Image.ANTIALIAS)
+    img_obj.thumbnail((500, 500), Image.ANTIALIAS)
     tk_image = ImageTk.PhotoImage(img_obj)
     return tk_image
 
@@ -64,6 +64,12 @@ def get_new_upload_image(b64_str):
         return tk_image
 
 
+def get_image_size(b64_str):
+    imgdata = base64.b64decode(b64_str)
+    im = Image.open(io.BytesIO(imgdata))
+    width, height = im.size
+    return width, height
+
 
 def main_window():
 
@@ -73,21 +79,45 @@ def main_window():
         original_new_upload['name'] = root.newFilename
         b64str = image_file_to_b64_string(root.newFilename)
         original_new_upload['b64_string'] = b64str
+        width = get_image_size(b64str)[0]
+        height = get_image_size(b64str)[1]
+        original_new_upload['upload_timestamp'] = str(datetime.now())
         # print("The selected image is {}".format(root.newFilename))
         new_tk_image = get_new_upload_image(b64str)
+        ori_metadata_change(original_new_upload['upload_timestamp'], width, height)
+        original_new_upload['upload_size'] = [width, height]
         bg_label_1.image = new_tk_image
         bg_label_1.configure(image=new_tk_image)
         return
+
+
+    def ori_metadata_change(timestamp, width, height):
+        ori_timestamp_label["text"] = "timestamp: {}".format(timestamp)
+        ori_size_label["text"] = "image size: {} * {}".format(width, height)
+        return
+
 
     def invert_button_cmd():
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
             original_new_upload['b64_string_inv'] = ndarray_to_b64_string(ndarray_inv)
+            b64str_inv = original_new_upload['b64_string_inv']
+            width = get_image_size(b64str_inv)[0]
+            height = get_image_size(b64str_inv)[1]
+            original_new_upload['processed_timestamp'] = str(datetime.now())
             new_tk_image_inv = ndarray_to_tkinter_image(ndarray_inv)
+            pro_metadata_change(original_new_upload['processed_timestamp'], width, height)
+            original_new_upload['processed_size'] = [width, height]
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
             return
+
+    def pro_metadata_change(timestamp, width, height):
+        processed_timestamp_label["text"] = "timestamp: {}".format(timestamp)
+        processed_size_label["text"] = "image size: {} * {}".format(width, height)
+        return
+
 
     def download_ori_cmd():
         if len(original_new_upload) != 0:
@@ -109,7 +139,9 @@ def main_window():
 
     root = Tk()
     root.title("Image Database")
-    root.geometry("1050x800")
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    root.geometry("{}x{}".format(int(screen_width*9/10), screen_height))
 
 
     # original image label
@@ -140,12 +172,10 @@ def main_window():
     bg_label_1.grid(column=0, row=3, columnspan=2, padx=5)
 
     # show original metadata
-    ori_timestamp_data = "Default"
-    ori_timestamp_label = ttk.Label(root, text="timestamp: {}".format(ori_timestamp_data))
+    ori_timestamp_label = ttk.Label(root, text="timestamp: ")
     ori_timestamp_label.grid(column=0, row=4, columnspan=2)
-    ori_size_data = 0
-    ori_size_data = ttk.Label(root, text="image size: {}".format(ori_size_data))
-    ori_size_data.grid(column=0, row=5, columnspan=2)
+    ori_size_label = ttk.Label(root, text="image size: ")
+    ori_size_label.grid(column=0, row=5, columnspan=2)
 
     # download original button
     ori_download_button = ttk.Button(root, text="Download", command=download_ori_cmd)
@@ -179,12 +209,10 @@ def main_window():
     bg_label_2.grid(column=3, row=3, columnspan=2)
 
     # show processed metadata
-    processed_timestamp_data = "Default"
-    processed_timestamp_label = ttk.Label(root, text="timestamp: {}".format(processed_timestamp_data))
+    processed_timestamp_label = ttk.Label(root, text="timestamp: ")
     processed_timestamp_label.grid(column=3, row=4, columnspan=2)
-    processed_size_data = 0
-    processed_size_data = ttk.Label(root, text="image size: {}".format(processed_size_data))
-    processed_size_data.grid(column=3, row=5, columnspan=2)
+    processed_size_label = ttk.Label(root, text="image size: ")
+    processed_size_label.grid(column=3, row=5, columnspan=2)
 
     # download processed button
     processed_download_button = ttk.Button(root, text="Download", command=download_processed_cmd)
