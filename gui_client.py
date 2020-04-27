@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 from skimage.io import imsave
 from datetime import datetime
 import requests
+import json
 
 
 server_name = "http://127.0.0.1:5000/"
@@ -129,7 +130,6 @@ def main_window():
             original_new_upload['processed_size'] = [width, height]
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
-            add_new_processed_to_db()
             return
 
     def pro_metadata_change(timestamp, width, height):
@@ -157,6 +157,15 @@ def main_window():
             b64_string_to_image_file(b64str_inv, root.downloadname_inv)
             return
 
+    def change_names():
+        r = requests.get(server_name + "/getOriginal")
+        str = r.content.decode("utf-8")[1:-2]
+        list = str.split(",")
+        new_list = []
+        for item in list:
+            new_list.append(item[1:-1])
+        return new_list
+
     root = Tk()
     root.title("Image Database")
     screen_width = root.winfo_screenwidth()
@@ -178,9 +187,8 @@ def main_window():
     # choose database dropdown
     ttk.Label(root, text="Select from database").grid(column=1, row=1)
     file_name = StringVar()
-    original_image_combo = ttk.Combobox(root, textvariable=file_name)
+    original_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names())
     original_image_combo.grid(column=1, row=2, padx=5)
-    original_image_combo['values'] = ("x", "y", "z")
     original_image_combo.state(['readonly'])
 
     # initialize upload background image
@@ -219,7 +227,7 @@ def main_window():
     file_name = StringVar()
     processed_image_combo = ttk.Combobox(root, textvariable=file_name)
     processed_image_combo.grid(column=4, row=2, padx=5)
-    processed_image_combo['values'] = ("x", "y", "z")
+    processed_image_combo['values'] = ["x", "y", "z"]
     processed_image_combo.state(['readonly'])
 
     # initialize processed background image
