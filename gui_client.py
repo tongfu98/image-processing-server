@@ -459,29 +459,30 @@ def main_window():
     open_button.grid(column=1, row=3)
 
     # initialize upload background image
-    background = Image.open("images/acl1.jpg")
+    background = Image.open("background.jpg")
+    background.thumbnail((500, 500), Image.ANTIALIAS)
     bg_image_1 = ImageTk.PhotoImage(background)
     bg_label_1 = ttk.Label(root, image=bg_image_1)
     bg_label_1.image = bg_image_1
-    bg_label_1.grid(column=0, row=4, columnspan=3, padx=5)
+    bg_label_1.grid(column=0, row=4, columnspan=3, padx=20)
 
     # show original metadata
     ori_timestamp_label = ttk.Label(root, text="timestamp: ")
-    ori_timestamp_label.grid(column=0, row=5, columnspan=2)
+    ori_timestamp_label.grid(column=0, row=5, columnspan=2, pady=10)
     ori_size_label = ttk.Label(root, text="image size: ")
     ori_size_label.grid(column=0, row=6, columnspan=2)
 
     # download original button
     ori_download_button = ttk.Button(root, text="Download",
                                      command=download_ori_cmd)
-    ori_download_button.grid(column=0, row=7, columnspan=2)
+    ori_download_button.grid(column=0, row=7, columnspan=2, pady=10)
 
     # image process label
     process_label = ttk.Label(root, text="Processed Image")
     process_label.grid(column=3, row=0, columnspan=2)
 
     # invert label
-    invert_label = ttk.Label(root, text="Invert the image you upload")
+    invert_label = ttk.Label(root, text="Invert the image you select")
     invert_label.grid(column=3, row=2, columnspan=2)
 
     # start inverting button
@@ -490,22 +491,23 @@ def main_window():
     invert_button.grid(column=3, row=3, columnspan=2)
 
     # initialize processed background image
-    background = Image.open("images/acl1.jpg")
+    background = Image.open("background.jpg")
+    background.thumbnail((500, 500), Image.ANTIALIAS)
     bg_image_2 = ImageTk.PhotoImage(background)
     bg_label_2 = ttk.Label(root, image=bg_image_2)
     bg_label_2.image = bg_image_1
-    bg_label_2.grid(column=3, row=4, columnspan=2)
+    bg_label_2.grid(column=3, row=4, columnspan=2, padx=50)
 
     # show processed metadata
     processed_timestamp_label = ttk.Label(root, text="timestamp: ")
-    processed_timestamp_label.grid(column=3, row=5, columnspan=2)
+    processed_timestamp_label.grid(column=3, row=5, columnspan=2, pady=10)
     processed_size_label = ttk.Label(root, text="image size: ")
     processed_size_label.grid(column=3, row=6, columnspan=2)
 
     # download processed button
     processed_download_button = ttk.Button(root, text="Download",
                                            command=download_processed_cmd)
-    processed_download_button.grid(column=3, row=7, columnspan=2)
+    processed_download_button.grid(column=3, row=7, columnspan=2, pady=10)
 
     root.mainloop()
     return
