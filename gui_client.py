@@ -19,6 +19,21 @@ original_new_upload = {}
 
 
 def image_file_to_b64_string(filename):
+
+    """Convert image file to base64 string.
+
+        This function converts image file to base64 string.
+
+        Args:
+            filename (string): the path and name of the
+            image file on computer
+
+        Returns:
+            b64_string (string): image bytes encoded
+            as a base64 string
+
+        """
+
     with open(filename, "rb") as image_file:
         b64_bytes = base64.b64encode(image_file.read())
     b64_string = str(b64_bytes, encoding='utf-8')
@@ -26,12 +41,43 @@ def image_file_to_b64_string(filename):
 
 
 def b64_string_to_image_file(b64_string, new_file_name):
+
+    """Convert base64 string to image file.
+
+        This function converts base64 string to image file.
+
+        Args:
+            b64_string (string): the image bytes
+            encoded as a base64 string
+
+            new_file_name (string): name of the file
+
+        Returns:
+            image_file (image file): an image file on the local computer
+            with the path and name contained in the new_filename variable
+        """
+
     image_bytes = base64.b64decode(b64_string)
     with open(new_file_name, "wb") as out_file:
         out_file.write(image_bytes)
 
 
 def b64_string_to_ndarray(b64_string):
+
+    """Convert base64 string to ndarray.
+
+        This function converts base64 string to ndarray
+         containing image data.
+
+        Args:
+            b64_string (string): the image bytes
+            encoded as a base64 string
+
+        Returns:
+            img_ndarray (ndarray): variable containing an
+            ndarray with image data
+        """
+
     image_bytes = base64.b64decode(b64_string)
     image_buf = io.BytesIO(image_bytes)
     img_ndarray = mpimg.imread(image_buf, format='JPG')
@@ -39,6 +85,20 @@ def b64_string_to_ndarray(b64_string):
 
 
 def ndarray_to_tkinter_image(img_ndarray):
+
+    """Convert ndarray  into a Tkinter label.
+
+        This function loads an ndarray containing an
+        image into a Tkinter label.
+
+        Args:
+            img_ndarray (ndarray): an ndarray with image data
+
+        Returns:
+            tk_image (Tk image): can be assigned to the 'image'
+            property of a tkinter Label or Button
+        """
+
     f = io.BytesIO()
     imsave(f, img_ndarray, plugin='pil')
     out_img = io.BytesIO()
@@ -50,6 +110,19 @@ def ndarray_to_tkinter_image(img_ndarray):
 
 
 def ndarray_to_b64_string(img_ndarray):
+
+    """Convert image in ndarray format into a base64 string.
+
+        This function converts ndarray to a base64 string.
+
+        Args:
+            img_ndarray (ndarray): an ndarray with image data
+
+        Returns:
+            b64_string (string): image bytes
+            encoded as a base64 string
+        """
+
     f = io.BytesIO()
     imsave(f, img_ndarray, plugin='pil')
     y = base64.b64encode(f.getvalue())
@@ -58,12 +131,41 @@ def ndarray_to_b64_string(img_ndarray):
 
 
 def get_new_upload_image(b64_str):
+
+    """Convert base64 string into a Tk image.
+
+        This function converts base64 string into a image
+        that can be furthur used as Tkinter label.
+
+        Args:
+            b64_str (string): image bytes
+            encoded as a base64 string
+
+        Returns:
+            tk_image (Tk image): can be assigned to the 'image'
+            property of a tkinter Label or Button
+        """
+
     img_ndarray = b64_string_to_ndarray(b64_str)
     tk_image = ndarray_to_tkinter_image(img_ndarray)
     return tk_image
 
 
 def get_image_size(b64_str):
+
+    """Gets image dimensions.
+
+        This function get image dimensions from a base64 string.
+
+        Args:
+            b64_str (string): image bytes
+            encoded as a base64 string
+
+        Returns:
+            width, height (list): a list containing width and height
+            in pixels
+        """
+
     imgdata = base64.b64decode(b64_str)
     im = Image.open(io.BytesIO(imgdata))
     width, height = im.size
@@ -71,12 +173,40 @@ def get_image_size(b64_str):
 
 
 def add_new_upload_to_db():
+
+    """Send info to database.
+
+        This function post the dictionary original_new_upload to database
+        in API route /addOriginal.
+
+        Args:
+            None
+
+        Returns:
+            r (request): a request that will dump the information
+            in json file to the database through API route
+        """
+
     new_upload = original_new_upload
     r = requests.post(server_name + "/addOriginal", json=new_upload)
     return r
 
 
 def add_new_processed_to_db():
+
+    """Send info to database.
+
+        This function post the dictionary original_new_upload to database
+        in API route /addInverted.
+
+        Args:
+            None
+
+        Returns:
+            r (request): a request that will dump the information
+            in json file to the database through API route
+        """
+
     new_upload = original_new_upload
     r = requests.post(server_name + "/addInverted", json=new_upload)
     return r
@@ -85,6 +215,13 @@ def add_new_processed_to_db():
 def main_window():
 
     def open_button_cmd():
+
+        """
+            This function will create a tk image from the base64 string
+            when the open button is pressed. It will also add the new
+            image information to the database.
+            """
+
         root.newFilename = filedialog.askopenfilename(
             initialdir="/", title="Select file",
             filetypes=(("jpeg files", "*.jpg"), ("all files", "*.*")))
@@ -105,11 +242,34 @@ def main_window():
         return
 
     def ori_metadata_change(timestamp, width, height):
+
+        """Send info to database.
+
+            This function will change the metadata under
+            the original image to show the time the image is opened
+            and the dimensions of the image.
+
+            Args:
+                timestamp (string): time stamp of current time
+                width (int): width of the image in pixel
+                height (int): height of the image in pixel
+
+            Returns:
+                None
+            """
+
         ori_timestamp_label["text"] = "timestamp: {}".format(timestamp)
         ori_size_label["text"] = "image size: {} * {}".format(width, height)
         return
 
     def invert_button_cmd():
+
+        """
+            This function will invert a tk image from the base64 string
+            when the invert button is pressed. It will also add the inverted
+            image information to the database.
+            """
+
         if len(original_new_upload) != 0:
             if original_image_combo.get() == "":
                 original_new_upload['inverted_name'] = \
@@ -133,9 +293,26 @@ def main_window():
             original_new_upload['processed_size'] = [width, height]
             bg_label_2.image = new_tk_image_inv
             bg_label_2.configure(image=new_tk_image_inv)
+            add_new_processed_to_db()
             return
 
     def pro_metadata_change(timestamp, width, height):
+
+        """Send info to database.
+
+            This function will change the metadata under
+            the inverted image to show the time the image is inverted
+            and the dimensions of the image.
+
+            Args:
+                timestamp (string): time stamp of current time
+                width (int): width of the image in pixel
+                height (int): height of the image in pixel
+
+            Returns:
+                None
+            """
+
         processed_timestamp_label["text"] = "timestamp: {}"\
             .format(timestamp)
         processed_size_label["text"] = "image size: {} * {}"\
@@ -143,6 +320,13 @@ def main_window():
         return
 
     def download_ori_cmd():
+
+        """
+            This function will download the image (original)
+            to local computer (a download window will show up),
+            and will allow the user to select the path.
+            """
+
         if len(original_new_upload) != 0:
             b64str = original_new_upload['b64_string']
             root.downloadname_ori = filedialog.asksaveasfilename(
@@ -152,6 +336,13 @@ def main_window():
             return
 
     def download_processed_cmd():
+
+        """
+            This function will download the image (inverted)
+            to local computer (a download window will show up),
+            and will allow the user to select the path.
+            """
+
         if len(original_new_upload) != 0:
             b64str_inv = original_new_upload['b64_string_inv']
             root.downloadname_inv = filedialog.asksaveasfilename(
@@ -161,6 +352,22 @@ def main_window():
             return
 
     def change_names_ori():
+
+        """Change the values in combobox.
+
+            This function will change the values in combobox
+            dynamically to reflect the change in database.
+            It will gives all the names of the images that are
+            currently stored in the database.
+
+            Args:
+                None
+
+            Returns:
+                new_list (list): a list that is generated by
+                making a get request from route /getOriginalNames
+            """
+
         r = requests.get(server_name + "/getOriginalNames")
         str = r.content.decode("utf-8")[1:-2]
         new_str = str.split(":")[1][1:-1]
@@ -170,17 +377,22 @@ def main_window():
             new_list.append(item[1:-1])
         return new_list
 
-    def change_names_inv():
-        r = requests.get(server_name + "/getInvertedNames")
-        str = r.content.decode("utf-8")[1:-2]
-        new_str = str.split(":")[1][1:-1]
-        list = new_str.split(",")
-        new_list = []
-        for item in list:
-            new_list.append(item[1:-1])
-        return new_list
-
     def get_original_b64():
+
+        """Get base64 string information in database.
+
+            This function will make a get request from
+            route /getOriginalB64 and will get base64
+            of all images that are stored in database.
+
+            Args:
+                None
+
+            Returns:
+                new_list (list): a list containing all base64
+                info of the images that is stored in database
+            """
+
         r = requests.get(server_name + "/getOriginalB64")
         str = r.content.decode("utf-8")[1:-2]
         new_str = str.split(":")[1][1:-1]
@@ -191,6 +403,12 @@ def main_window():
         return new_list
 
     def open_data_ori_button_cmd():
+
+        """
+            This function will open the image if an image
+            is selected in the combobox menu.
+            """
+
         name = original_image_combo.get()
         for ind, item in enumerate(change_names_ori()):
             if name == item:
