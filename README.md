@@ -45,12 +45,14 @@ https://github.com/dward2/BME547/blob/master/Resources/image_toolbox.md#testing-
 
 The realeased .zip file will include:
 
-1) *cloud_server*: the main server
-2) *test_cloud_server*: a unit test program to perform pytest
-3) *gui_client*: the GUI client to be interacted with
+1) *cloud_server.py*: the main server
+2) *test_cloud_server.py*: a unit test program to perform pytest
+3) *gui_client.py*: the GUI client to be interacted with
 4) *requirements.txt*: required environment for this project
-5) *test_image_1* and *test_image_2*: test images for pytest.
-6) *background*: the background photo when the GUI client is first initialized.
+5) *test_image_1.jpg* and *test_image_2.jpg*: test images for pytest.
+6) *background.jpg*: the background photo when the GUI client is first initialized.
+7) *images*: a folder containing sample images.
+8) *video demonstration.mp4*: video demonstration of the project
 
 
 ## How to run the program
@@ -81,6 +83,8 @@ The realeased .zip file will include:
 
 
 ## Program Interpretation
+
+There is a video demonstration for how to use the program.
 
 ### Routes
 
