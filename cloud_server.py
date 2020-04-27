@@ -55,16 +55,20 @@ def is_upload_in_database(b64str):
         all_b64str.append(im.b64_string)
     if b64str in all_b64str:
         return True
+    else:
+        return False
 
 
-def is_inverted_in_database(b64str):
+def is_inverted_in_database(b64str_inv):
 
     all_b64str_inv = []
     all_inverted = InvertedImages.objects.raw({})
     for im in all_inverted:
         all_b64str_inv.append(im.b64_string_inv)
-    if b64str in all_b64str_inv:
+    if b64str_inv in all_b64str_inv:
         return True
+    else:
+        return False
 
 
 def add_original_to_database(name, b64str, time, size):
@@ -73,6 +77,7 @@ def add_original_to_database(name, b64str, time, size):
                                   upload_timestamp=time,
                                   upload_size=size)
     new_original.save()
+
 
 def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
     new_inverted = InvertedImages(name_inv=name_inv,
@@ -86,62 +91,30 @@ def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
 def post_original_data():
     in_dict = request.get_json()
     check_result = is_upload_in_database(in_dict["b64_string"])
-    # if check_result is False:
-    name = in_dict["name"]
-    b64str = in_dict["b64_string"]
-    time = in_dict["upload_timestamp"]
-    size = in_dict["upload_size"]
-    add_original_to_database(name, b64str, time, size)
-    return "successfully add original", 200
+    if check_result is False:
+        name = in_dict["name"]
+        b64str = in_dict["b64_string"]
+        time = in_dict["upload_timestamp"]
+        size = in_dict["upload_size"]
+        add_original_to_database(name, b64str, time, size)
+        return "successfully add original", 200
+    else:
+        return "image already exists", 200
 
 
 @app.route('/addInverted', methods=['POST'])
 def post_inverted_data():
     in_dict = request.get_json()
     check_result = is_inverted_in_database(in_dict["b64_string_inv"])
-    # if check_result is False:
-    name_inv = in_dict["inverted_name"]
-    b64str_inv = in_dict["b64_string_inv"]
-    time_inv = in_dict["processed_timestamp"]
-    size_inv = in_dict["processed_size"]
-    add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv)
-    return "successfully add processed", 200
-
-# def get_all_countries():
-#     image_b64str = []
-#     all_images = Images.objects.raw({})
-#     for image in all_images:
-#         if image.home_team not in teams:
-#             teams.append(game.home_team)
-#         if game.away_team not in teams:
-#             teams.append(game.away_team)
-#         teams.sort()
-#         for team in teams:
-#             print(team)
-#
-#
-# def get_England_home_games():
-#     england_home = WC_Game.objects.raw({"home_team":"England"})
-#     print(england_home.count())
-#     for game in england_home:
-#         print("{}: {} {} - {} {}".format(game.year. game.home_team,
-#                                          game.home_team_score, game.away_team,
-#                                          game.away_team_score))
-#
-#
-# def get_England_away_games():
-#     england_away = WC_Game.objects.raw({"away_team": "England"})
-#     print(england_away.count())
-#     for game in england_away:
-#         print("{}: {} {} - {} {}".format(game.year.game.home_team,
-#                                          game.home_team_score, game.away_team,
-#                                          game.away_team_score))
-#
-# def get_England_all_games():
-#     england_all = WC_Game.objects.raw({"$and": [
-#         {"year":1958},
-#         {"$or": [{"home_team": "England"}, {"away_team": "England"}]}
-#     ]})
+    if check_result is False:
+        name_inv = in_dict["inverted_name"]
+        b64str_inv = in_dict["b64_string_inv"]
+        time_inv = in_dict["processed_timestamp"]
+        size_inv = in_dict["processed_size"]
+        add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv)
+        return "successfully add processed", 200
+    else:
+        return "image already exists", 200
 
 
 
