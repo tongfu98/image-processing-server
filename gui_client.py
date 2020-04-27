@@ -114,7 +114,6 @@ def main_window():
             original_new_upload['inverted_name'] = \
                 root.newFilename.split("/")[-1].split(".")[0] +\
                 "_inv." + root.newFilename.split("/")[-1].split(".")[-1]
-
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
             original_new_upload['b64_string_inv'] = \
@@ -157,14 +156,54 @@ def main_window():
             b64_string_to_image_file(b64str_inv, root.downloadname_inv)
             return
 
-    def change_names():
-        r = requests.get(server_name + "/getOriginal")
+    def change_names_ori():
+        r = requests.get(server_name + "/getOriginalNames")
         str = r.content.decode("utf-8")[1:-2]
-        list = str.split(",")
+        new_str = str.split(":")[1][1:-1]
+        list = new_str.split(",")
         new_list = []
         for item in list:
             new_list.append(item[1:-1])
         return new_list
+
+    def change_names_inv():
+        r = requests.get(server_name + "/getInvertedNames")
+        str = r.content.decode("utf-8")[1:-2]
+        new_str = str.split(":")[1][1:-1]
+        list = new_str.split(",")
+        new_list = []
+        for item in list:
+            new_list.append(item[1:-1])
+        return new_list
+
+    def get_original_b64():
+        r = requests.get(server_name + "/getOriginalB64")
+        str = r.content.decode("utf-8")[1:-2]
+        new_str = str.split(":")[1][1:-1]
+        list = new_str.split(",")
+        new_list = []
+        for item in list:
+            new_list.append(item[1:-1])
+        return new_list
+
+    def open_data_ori_button_cmd():
+        name = original_image_combo.get()
+        for ind, item in enumerate(change_names_ori()):
+            if name == item:
+                b64str = get_original_b64()[ind]
+        original_new_upload['name'] = change_names_ori()[ind]
+        new_tk_image = get_new_upload_image(b64str)
+        original_new_upload['b64_string'] = b64str
+        width = get_image_size(b64str)[0]
+        height = get_image_size(b64str)[1]
+        original_new_upload['upload_timestamp'] = str(datetime.now())
+        ori_metadata_change(original_new_upload['upload_timestamp'],
+                            width, height)
+        original_new_upload['upload_size'] = [width, height]
+        bg_label_1.image = new_tk_image
+        bg_label_1.configure(image=new_tk_image)
+        # add_new_upload_to_db()
+        return
 
     root = Tk()
     root.title("Image Database")
@@ -181,33 +220,37 @@ def main_window():
     select_label.grid(column=0, row=1)
 
     # open original button
-    open_button = ttk.Button(root, text="Open", command=open_button_cmd)
-    open_button.grid(column=0, row=2)
+    open_button_1 = ttk.Button(root, text="Open", command=open_button_cmd)
+    open_button_1.grid(column=0, row=2)
 
     # choose database dropdown
     ttk.Label(root, text="Select from database").grid(column=1, row=1)
     file_name = StringVar()
-    original_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names())
+    original_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names_ori())
     original_image_combo.grid(column=1, row=2, padx=5)
     original_image_combo.state(['readonly'])
+
+    # open database original button
+    open_button = ttk.Button(root, text="Open", command=open_data_ori_button_cmd)
+    open_button.grid(column=1, row=3)
 
     # initialize upload background image
     background = Image.open("images/acl1.jpg")
     bg_image_1 = ImageTk.PhotoImage(background)
     bg_label_1 = ttk.Label(root, image=bg_image_1)
     bg_label_1.image = bg_image_1
-    bg_label_1.grid(column=0, row=3, columnspan=2, padx=5)
+    bg_label_1.grid(column=0, row=4, columnspan=3, padx=5)
 
     # show original metadata
     ori_timestamp_label = ttk.Label(root, text="timestamp: ")
-    ori_timestamp_label.grid(column=0, row=4, columnspan=2)
+    ori_timestamp_label.grid(column=0, row=5, columnspan=2)
     ori_size_label = ttk.Label(root, text="image size: ")
-    ori_size_label.grid(column=0, row=5, columnspan=2)
+    ori_size_label.grid(column=0, row=6, columnspan=2)
 
     # download original button
     ori_download_button = ttk.Button(root, text="Download",
                                      command=download_ori_cmd)
-    ori_download_button.grid(column=0, row=6, columnspan=2)
+    ori_download_button.grid(column=0, row=7, columnspan=2)
 
     # image process label
     process_label = ttk.Label(root, text="Processed Image")
@@ -225,28 +268,31 @@ def main_window():
     # choose database dropdown
     ttk.Label(root, text="Select from database").grid(column=4, row=1)
     file_name = StringVar()
-    processed_image_combo = ttk.Combobox(root, textvariable=file_name)
+    processed_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names_inv())
     processed_image_combo.grid(column=4, row=2, padx=5)
-    processed_image_combo['values'] = ["x", "y", "z"]
     processed_image_combo.state(['readonly'])
+
+    # open database processed button
+    open_button_2 = ttk.Button(root, text="Open")
+    open_button_2.grid(column=4, row=3)
 
     # initialize processed background image
     background = Image.open("images/acl1.jpg")
     bg_image_2 = ImageTk.PhotoImage(background)
     bg_label_2 = ttk.Label(root, image=bg_image_2)
     bg_label_2.image = bg_image_1
-    bg_label_2.grid(column=3, row=3, columnspan=2)
+    bg_label_2.grid(column=3, row=4, columnspan=2)
 
     # show processed metadata
     processed_timestamp_label = ttk.Label(root, text="timestamp: ")
-    processed_timestamp_label.grid(column=3, row=4, columnspan=2)
+    processed_timestamp_label.grid(column=3, row=5, columnspan=2)
     processed_size_label = ttk.Label(root, text="image size: ")
-    processed_size_label.grid(column=3, row=5, columnspan=2)
+    processed_size_label.grid(column=3, row=6, columnspan=2)
 
     # download processed button
     processed_download_button = ttk.Button(root, text="Download",
                                            command=download_processed_cmd)
-    processed_download_button.grid(column=3, row=6, columnspan=2)
+    processed_download_button.grid(column=3, row=7, columnspan=2)
 
     root.mainloop()
     return
