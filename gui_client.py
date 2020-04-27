@@ -459,11 +459,12 @@ def main_window():
     open_button.grid(column=1, row=3)
 
     # initialize upload background image
-    background = Image.open("images/acl1.jpg")
+    background = Image.open("background.jpg")
+    background.thumbnail((500, 500), Image.ANTIALIAS)
     bg_image_1 = ImageTk.PhotoImage(background)
     bg_label_1 = ttk.Label(root, image=bg_image_1)
     bg_label_1.image = bg_image_1
-    bg_label_1.grid(column=0, row=4, columnspan=3, padx=5)
+    bg_label_1.grid(column=0, row=4, columnspan=3, padx=20)
 
     # show original metadata
     ori_timestamp_label = ttk.Label(root, text="timestamp: ")
@@ -481,7 +482,7 @@ def main_window():
     process_label.grid(column=3, row=0, columnspan=2)
 
     # invert label
-    invert_label = ttk.Label(root, text="Invert the image you upload")
+    invert_label = ttk.Label(root, text="Invert the image you select")
     invert_label.grid(column=3, row=2, columnspan=2)
 
     # start inverting button
@@ -490,11 +491,12 @@ def main_window():
     invert_button.grid(column=3, row=3, columnspan=2)
 
     # initialize processed background image
-    background = Image.open("images/acl1.jpg")
+    background = Image.open("background.jpg")
+    background.thumbnail((500, 500), Image.ANTIALIAS)
     bg_image_2 = ImageTk.PhotoImage(background)
     bg_label_2 = ttk.Label(root, image=bg_image_2)
     bg_label_2.image = bg_image_1
-    bg_label_2.grid(column=3, row=4, columnspan=2)
+    bg_label_2.grid(column=3, row=4, columnspan=2, padx=50)
 
     # show processed metadata
     processed_timestamp_label = ttk.Label(root, text="timestamp: ")
