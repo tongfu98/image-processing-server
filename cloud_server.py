@@ -11,12 +11,12 @@ app.config['MONGO_URI'] = "mongodb://localhost:27017/images"
 mongo = PyMongo(app)
 
 
-
 class OriginalImages(MongoModel):
     name = fields.CharField()
     b64_string = fields.CharField()
     upload_timestamp = fields.CharField()
     upload_size = fields.ListField()
+
 
 class InvertedImages(MongoModel):
     name_inv = fields.CharField()
@@ -30,21 +30,6 @@ def init_db():
     connect("mongodb+srv://tongfu:Fu19980311tong"
             "@images-yiprk.mongodb.net/images?retryWrites=true&w=majority")
     print("Connected to database.")
-
-
-
-# def add_images_to_original():
-#     new_original =OriginalImages(name = "test_image_1.jpg",
-#                        b64_string = "iVBORw0KGgoAAAANSUhEUgAABD0AAALmCAYAAABB3e+uAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ",
-#                        upload_timestamp = "20120303",
-#                        upload_size = [30,30])
-#     new_inverted =InvertedImages(inverted_name = "test_image_1.jpg",
-#                                  b64_string_inv = "iVBORw0KGgoAAAANSUhEUgAABD0AAALmCAYAAABB3e+uAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJ",
-#                                  processed_timestamp = "20120303",
-#                                  processed_size = [30,30])
-#     new_original.save()
-#     new_inverted.save()
-
 
 
 def is_upload_in_database(b64str):
@@ -77,6 +62,7 @@ def add_original_to_database(name, b64str, time, size):
                                   upload_timestamp=time,
                                   upload_size=size)
     new_original.save()
+    return True
 
 
 def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
@@ -85,6 +71,7 @@ def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
                                   processed_timestamp=time_inv,
                                   processed_size=size_inv)
     new_inverted.save()
+    return True
 
 
 @app.route('/addOriginal', methods=['POST'])
@@ -117,10 +104,6 @@ def post_inverted_data():
         return "image already exists", 200
 
 
-
 if __name__ == "__main__":
     init_db()
-    # add_images_to_original()
     app.run()
-
-
