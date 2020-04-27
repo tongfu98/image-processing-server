@@ -13,8 +13,8 @@ import requests
 
 
 server_name = "http://127.0.0.1:5000/"
+
 original_new_upload = {}
-processed_new_upload = {}
 
 
 def image_file_to_b64_string(filename):
@@ -68,10 +68,12 @@ def get_image_size(b64_str):
     width, height = im.size
     return width, height
 
+
 def add_new_upload_to_db():
     new_upload = original_new_upload
     r = requests.post(server_name + "/addOriginal", json=new_upload)
     return r
+
 
 def add_new_processed_to_db():
     new_upload = original_new_upload
@@ -108,8 +110,10 @@ def main_window():
 
     def invert_button_cmd():
         if len(original_new_upload) != 0:
-            original_new_upload['inverted_name'] = root.newFilename.split("/")[-1].split(".")[0] + "_inv." + \
-                                                   root.newFilename.split("/")[-1].split(".")[-1]
+            original_new_upload['inverted_name'] = \
+                root.newFilename.split("/")[-1].split(".")[0] +\
+                "_inv." + root.newFilename.split("/")[-1].split(".")[-1]
+
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
             original_new_upload['b64_string_inv'] = \
