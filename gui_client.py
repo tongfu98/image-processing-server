@@ -111,9 +111,12 @@ def main_window():
 
     def invert_button_cmd():
         if len(original_new_upload) != 0:
-            original_new_upload['inverted_name'] = \
-                root.newFilename.split("/")[-1].split(".")[0] +\
-                "_inv." + root.newFilename.split("/")[-1].split(".")[-1]
+            if original_image_combo.get() == "":
+                original_new_upload['inverted_name'] = \
+                    root.newFilename.split("/")[-1].split(".")[0] +\
+                    "_inv." + root.newFilename.split("/")[-1].split(".")[-1]
+            else:
+                original_new_upload['inverted_name'] = original_image_combo.get()
             b64str = original_new_upload['b64_string']
             ndarray_inv = np.invert(b64_string_to_ndarray(b64str))
             original_new_upload['b64_string_inv'] = \
@@ -226,12 +229,14 @@ def main_window():
     # choose database dropdown
     ttk.Label(root, text="Select from database").grid(column=1, row=1)
     file_name = StringVar()
-    original_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names_ori())
+    original_image_combo = ttk.Combobox(root, textvariable=file_name,
+                                        values=change_names_ori())
     original_image_combo.grid(column=1, row=2, padx=5)
     original_image_combo.state(['readonly'])
 
     # open database original button
-    open_button = ttk.Button(root, text="Open", command=open_data_ori_button_cmd)
+    open_button = ttk.Button(root, text="Open",
+                             command=open_data_ori_button_cmd)
     open_button.grid(column=1, row=3)
 
     # initialize upload background image
@@ -258,23 +263,23 @@ def main_window():
 
     # invert label
     invert_label = ttk.Label(root, text="Invert the image you upload")
-    invert_label.grid(column=3, row=1)
+    invert_label.grid(column=3, row=2, columnspan=2)
 
     # start inverting button
     invert_button = ttk.Button(root, text="Invert",
                                command=invert_button_cmd)
-    invert_button.grid(column=3, row=2)
+    invert_button.grid(column=3, row=3, columnspan=2)
 
     # choose database dropdown
-    ttk.Label(root, text="Select from database").grid(column=4, row=1)
-    file_name = StringVar()
-    processed_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names_inv())
-    processed_image_combo.grid(column=4, row=2, padx=5)
-    processed_image_combo.state(['readonly'])
+    # ttk.Label(root, text="Select from database").grid(column=4, row=1)
+    # file_name = StringVar()
+    # processed_image_combo = ttk.Combobox(root, textvariable=file_name, values=change_names_inv())
+    # processed_image_combo.grid(column=4, row=2, padx=5)
+    # processed_image_combo.state(['readonly'])
 
     # open database processed button
-    open_button_2 = ttk.Button(root, text="Open")
-    open_button_2.grid(column=4, row=3)
+    # open_button_2 = ttk.Button(root, text="Open", command=open_data_inv_button_cmd)
+    # open_button_2.grid(column=4, row=3)
 
     # initialize processed background image
     background = Image.open("images/acl1.jpg")
