@@ -3,12 +3,15 @@ from datetime import datetime
 import requests
 from pymodm import connect, MongoModel, fields
 from flask_pymongo import PyMongo
+import json
+
 
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = "images"
 app.config['MONGO_URI'] = "mongodb://localhost:27017/images"
 mongo = PyMongo(app)
+
 
 
 class OriginalImages(MongoModel):
@@ -102,6 +105,18 @@ def post_inverted_data():
         return "successfully add processed", 200
     else:
         return "image already exists", 200
+
+
+@app.route("/getOriginal", methods=["GET"])
+def get_original_images():
+    images = {}
+    images["names"] = []
+    all_games = OriginalImages.objects.raw({})
+    for game in all_games:
+        images["names"].append(game.name)
+    return jsonify(images)
+
+
 
 
 if __name__ == "__main__":
