@@ -26,6 +26,11 @@ class InvertedImages(MongoModel):
 
 
 def init_db():
+
+    """
+        Initialized and connected to mongodb database.
+        """
+
     print("Connecting to database...")
     connect("mongodb+srv://tongfu:Fu19980311tong"
             "@images-yiprk.mongodb.net/images?retryWrites=true&w=majority")
@@ -33,6 +38,21 @@ def init_db():
 
 
 def is_upload_in_database(b64str):
+
+    """Check if the image is in database.
+
+        This function will check if the image uploaded is
+        already in database. It will return True if the image is
+        in database and False if not in database.
+
+        Args:
+            b64str (string): the image bytes
+            encoded as a base64 string
+
+        Returns:
+            True or False (boolean): True if image is in database
+
+        """
 
     all_b64str = []
     all_original = OriginalImages.objects.raw({})
@@ -46,6 +66,21 @@ def is_upload_in_database(b64str):
 
 def is_inverted_in_database(b64str_inv):
 
+    """Check if the image is in database.
+
+        This function will check if the image inverted is
+        already in database. It will return True if the image is
+        in database and False if not in database.
+
+        Args:
+            b64str (string): the image bytes
+            encoded as a base64 string
+
+        Returns:
+            True or False (boolean): True if image is in database
+
+        """
+
     all_b64str_inv = []
     all_inverted = InvertedImages.objects.raw({})
     for im in all_inverted:
@@ -57,6 +92,25 @@ def is_inverted_in_database(b64str_inv):
 
 
 def add_original_to_database(name, b64str, time, size):
+
+    """Add the original image info to database.
+
+        This function will add the original image information
+        (name, base64 string, time uploaded, size of the image)
+        to the database collection OriginalImages.
+
+        Args:
+            name (string): name of the image
+            b64str (string): the image bytes encoded
+            as a base64 string
+            time (string): uploaded time
+            size (list): dimension of the image in pixels
+
+        Returns:
+            True (boolean): True if image is added
+
+        """
+
     new_original = OriginalImages(name=name,
                                   b64_string=b64str,
                                   upload_timestamp=time,
@@ -66,6 +120,25 @@ def add_original_to_database(name, b64str, time, size):
 
 
 def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
+
+    """Add the inverted image info to database.
+
+        This function will add the inverted image information
+        (name, base64 string, time uploaded, size of the image)
+        to the database collection InvertedImages.
+
+        Args:
+            name_inv (string): name of the image
+            b64str_inv (string): the image bytes encoded
+            as a base64 string
+            time_inv (string): uploaded time
+            size_inv (list): dimension of the image in pixels
+
+        Returns:
+            True (boolean): True if image is added
+
+        """
+
     new_inverted = InvertedImages(name_inv=name_inv,
                                   b64_string_inv=b64str_inv,
                                   processed_timestamp=time_inv,
@@ -76,6 +149,22 @@ def add_inverted_to_database(name_inv, b64str_inv, time_inv, size_inv):
 
 @app.route('/addOriginal', methods=['POST'])
 def post_original_data():
+
+    """Post original image info to database.
+
+        This function will post the original image info from
+        interacting with the client to database. If
+        the image already exists, it will not add the
+        info to the database.
+
+        Args:
+           None
+
+        Returns:
+            status (string): status of the request
+
+        """
+
     in_dict = request.get_json()
     check_result = is_upload_in_database(in_dict["b64_string"])
     if check_result is False:
@@ -91,6 +180,22 @@ def post_original_data():
 
 @app.route('/addInverted', methods=['POST'])
 def post_inverted_data():
+
+    """Post inverted image info to database.
+
+        This function will post the inverted image info from
+        interacting with the client to database. If
+        the image already exists, it will not add the
+        info to the database.
+
+        Args:
+           None
+
+        Returns:
+            status (string): status of the request
+
+        """
+
     in_dict = request.get_json()
     check_result = is_inverted_in_database(in_dict["b64_string_inv"])
     if check_result is False:
@@ -106,6 +211,22 @@ def post_inverted_data():
 
 @app.route("/getOriginalNames", methods=["GET"])
 def get_original_images():
+
+    """Get the name list of the original images in database.
+
+        This function will get a list of the original images in
+        database and convert it to JSON string so that it
+        can be sent to the client.
+
+        Args:
+           None
+
+        Returns:
+            images_ori (string): JSON string of the names
+            of the images in database
+
+        """
+
     images_ori = {}
     images_ori["names_ori"] = []
     all_ori = OriginalImages.objects.raw({})
@@ -116,6 +237,22 @@ def get_original_images():
 
 @app.route("/getInvertedNames", methods=["GET"])
 def get_inverted_images():
+
+    """Get the name list of the inverted images in database.
+
+        This function will get a list of the inverted images in
+        database and convert it to JSON string so that it
+        can be sent to the client.
+
+        Args:
+           None
+
+        Returns:
+            images_inv (string): JSON string of the names
+            of the images in database
+
+        """
+
     images_inv = {}
     images_inv["names_inv"] = []
     all_inv = InvertedImages.objects.raw({})
@@ -126,6 +263,22 @@ def get_inverted_images():
 
 @app.route("/getOriginalB64", methods=["GET"])
 def get_original_b64():
+
+    """Get the base64 list of the original images in database.
+
+        This function will get a list of the original base64
+        strings in database and convert it to JSON string
+        so that it can be sent to the client.
+
+        Args:
+           None
+
+        Returns:
+            images_ori (string): JSON string of the base64
+            of all original images in database
+
+        """
+
     images_ori = {}
     images_ori["b64_ori"] = []
     all_ori = OriginalImages.objects.raw({})
@@ -136,6 +289,22 @@ def get_original_b64():
 
 @app.route("/getInvertedB64", methods=["GET"])
 def get_inverted_b64():
+
+    """Get the base64 list of the inverted images in database.
+
+        This function will get a list of the inverted base64
+        strings in database and convert it to JSON string
+        so that it can be sent to the client.
+
+        Args:
+           None
+
+        Returns:
+            images_inv (string): JSON string of the base64
+            of all inverted images in database
+
+        """
+
     images_inv = {}
     images_inv["b64_ori_inv"] = []
     all_inv = InvertedImages.objects.raw({})
