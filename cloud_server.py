@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 from pymodm import connect, MongoModel, fields
 from flask_pymongo import PyMongo
-
+import json
 
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = "images"
@@ -102,6 +102,46 @@ def post_inverted_data():
         return "successfully add processed", 200
     else:
         return "image already exists", 200
+
+
+@app.route("/getOriginalNames", methods=["GET"])
+def get_original_images():
+    images_ori = {}
+    images_ori["names_ori"] = []
+    all_ori = OriginalImages.objects.raw({})
+    for im in all_ori:
+        images_ori["names_ori"].append(im.name)
+    return jsonify(images_ori)
+
+
+@app.route("/getInvertedNames", methods=["GET"])
+def get_inverted_images():
+    images_inv = {}
+    images_inv["names_inv"] = []
+    all_inv = InvertedImages.objects.raw({})
+    for im in all_inv:
+        images_inv["names_inv"].append(im.name_inv)
+    return jsonify(images_inv)
+
+
+@app.route("/getOriginalB64", methods=["GET"])
+def get_original_b64():
+    images_ori = {}
+    images_ori["b64_ori"] = []
+    all_ori = OriginalImages.objects.raw({})
+    for im in all_ori:
+        images_ori["b64_ori"].append(im.b64_string)
+    return jsonify(images_ori)
+
+
+@app.route("/getInvertedB64", methods=["GET"])
+def get_inverted_b64():
+    images_inv = {}
+    images_inv["b64_ori_inv"] = []
+    all_inv = InvertedImages.objects.raw({})
+    for im in all_inv:
+        images_inv["b64_ori_inv"].append(im.b64_string_inv)
+    return jsonify(images_inv)
 
 
 if __name__ == "__main__":
