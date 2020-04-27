@@ -5,13 +5,10 @@ from pymodm import connect, MongoModel, fields
 from flask_pymongo import PyMongo
 import json
 
-
-
 app = Flask(__name__)
 app.config['MONGO_DBNAME'] = "images"
 app.config['MONGO_URI'] = "mongodb://localhost:27017/images"
 mongo = PyMongo(app)
-
 
 
 class OriginalImages(MongoModel):
@@ -136,6 +133,15 @@ def get_original_b64():
         images_ori["b64_ori"].append(im.b64_string)
     return jsonify(images_ori)
 
+
+@app.route("/getInvertedB64", methods=["GET"])
+def get_inverted_b64():
+    images_inv = {}
+    images_inv["b64_ori_inv"] = []
+    all_inv = InvertedImages.objects.raw({})
+    for im in all_inv:
+        images_inv["b64_ori_inv"].append(im.b64_string_inv)
+    return jsonify(images_inv)
 
 
 if __name__ == "__main__":
