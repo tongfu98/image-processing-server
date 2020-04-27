@@ -28,6 +28,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## Graphical User Interface
+![](GUI.jpg)
+
 ## Overview
 
 This project developed a image processor that will allows user to choose a photo from local computer **or** select a photo from database and invert the image. It also displays the timestamp that the user uploaded or selected the photo **and** the image dimensions (width * height). Moreover, the user can also download an image in database or an image processed.
@@ -35,6 +38,10 @@ This project developed a image processor that will allows user to choose a photo
 More information could be found at:
 
 https://github.com/dward2/BME547/blob/master/Assignments/final_image_processor.md
+
+Some codes for handling image processing are taken from:
+
+https://github.com/dward2/BME547/blob/master/Resources/image_toolbox.md#testing-toolbox-code
 
 The realeased .zip file will include:
 
