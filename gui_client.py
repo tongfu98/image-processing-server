@@ -468,14 +468,14 @@ def main_window():
 
     # show original metadata
     ori_timestamp_label = ttk.Label(root, text="timestamp: ")
-    ori_timestamp_label.grid(column=0, row=5, columnspan=2)
+    ori_timestamp_label.grid(column=0, row=5, columnspan=2, pady=10)
     ori_size_label = ttk.Label(root, text="image size: ")
     ori_size_label.grid(column=0, row=6, columnspan=2)
 
     # download original button
     ori_download_button = ttk.Button(root, text="Download",
                                      command=download_ori_cmd)
-    ori_download_button.grid(column=0, row=7, columnspan=2)
+    ori_download_button.grid(column=0, row=7, columnspan=2, pady=10)
 
     # image process label
     process_label = ttk.Label(root, text="Processed Image")
@@ -500,14 +500,14 @@ def main_window():
 
     # show processed metadata
     processed_timestamp_label = ttk.Label(root, text="timestamp: ")
-    processed_timestamp_label.grid(column=3, row=5, columnspan=2)
+    processed_timestamp_label.grid(column=3, row=5, columnspan=2, pady=10)
     processed_size_label = ttk.Label(root, text="image size: ")
     processed_size_label.grid(column=3, row=6, columnspan=2)
 
     # download processed button
     processed_download_button = ttk.Button(root, text="Download",
                                            command=download_processed_cmd)
-    processed_download_button.grid(column=3, row=7, columnspan=2)
+    processed_download_button.grid(column=3, row=7, columnspan=2, pady=10)
 
     root.mainloop()
     return
